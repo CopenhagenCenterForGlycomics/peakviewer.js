@@ -1,6 +1,6 @@
 module.exports = {
   entry: {
-    'glycan': [ './js/peaks.js' ],
+    'peaks': [ './js/peaks.js' ],
   },
   devtool: 'source-map',
   mode: 'development',
