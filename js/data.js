@@ -1,13 +1,14 @@
 
 import { select } from 'd3-selection';
-import { scaleLinear } from 'd3-scale';
 
-const yScale = scaleLinear().range([0,90]).domain([100,0]);
-const xScale = scaleLinear().range([0,400]);
+import canvasScale from './scale';
+
 const drawData = (element,range,data) => {
+
+  const {x : xScale ,y : yScale } = canvasScale(element.ownerSVGElement);
+
   xScale.domain(range);
-  let max_y = Math.ceil(Math.max(...data.filter(d => d[0] <= range[1] && d[0] >= range[0] ).map( d => d[1] )));
-  yScale.domain([max_y,0]);
+  let max_y = yScale.domain()[0];
 
   let rects = select(element)
   .selectAll('rect')

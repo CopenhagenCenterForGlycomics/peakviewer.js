@@ -7,9 +7,12 @@ const module_string='peaksjs:peakviewer';
 
 const log = debug(module_string);
 
-import drawAxis from './axis';
+import { drawAxis, updateAxis } from './axis';
+import { wireEvents } from './event_annotation';
 
 import drawData from './data';
+
+import canvasScale from './scale';
 
 const symbol_range = Symbol('range');
 const symbol_data = Symbol('data');
@@ -21,6 +24,8 @@ tmpl.innerHTML = `
   :host {
     display: block;
     position: relative;
+    --selection-color: #f00;
+    --selection-opacity: 0.1;
   }
 
   :host([resizeable]) {
@@ -33,6 +38,11 @@ tmpl.innerHTML = `
     height: 100%;
   }
 
+  #selection rect {
+    fill: var(--selection-color,#f00);
+    opacity: var(--selection-opacity,0.5);
+  }
+
   @media only screen
     and (min-device-width: 320px)
     and (max-device-width: 480px)
@@ -43,6 +53,9 @@ tmpl.innerHTML = `
 
 <div class="widget_contents" >
 <svg id="canvas" viewBox="0 0 450 125">
+  <g id="selection" transform="translate(30,0)">
+    <rect width="0" height="90" x="30" y="5" />
+  </g>
   <g id="xaxis" transform="translate(30,95)"></g>
   <g id="yaxis" transform="translate(30,5)"></g>
   <g id="peaks" transform="translate(30,5)"></g>
@@ -60,7 +73,8 @@ if (window.ShadyCSS) {
 
 
 const refresh = (viewer) => {
-  drawAxis(viewer.shadowRoot.querySelector('svg'),viewer.range,viewer.data);
+  updateAxis(viewer.shadowRoot.querySelector('svg'),viewer.range,viewer.data);
+  drawAxis(viewer.shadowRoot.querySelector('svg'));
   drawData(viewer.shadowRoot.querySelector('svg #peaks'),viewer.range,viewer.data);
 };
 
@@ -68,7 +82,7 @@ const refresh = (viewer) => {
 class Peakviewer extends WrapHTML {
 
   static get observedAttributes() {
-    return ['range'];
+    return ['range','selected'];
   }
 
   constructor() {
@@ -81,6 +95,14 @@ class Peakviewer extends WrapHTML {
       this[symbol_range] = this.getAttribute('range').split('-').map( val => parseFloat(val.trim()) );
       refresh(this);
     }
+    if (name === 'selected') {
+      let canvas = this.shadowRoot.querySelector('svg');
+      let selection_rect = canvas.querySelector('#selection rect');
+      const {x : xScale} = canvasScale(canvas);
+      let [start,end] = this.getAttribute('selected').split('-').map( val => parseFloat(val.trim()) );
+      selection_rect.setAttribute('width',Math.abs(xScale(end) - xScale(start)));
+      selection_rect.setAttribute('x',xScale(start));
+    }
   }
 
   get range() {
@@ -89,9 +111,9 @@ class Peakviewer extends WrapHTML {
 
   set data(data) {
     this[symbol_data] = data;
-    let mzvals = data.map( d => d[0]);
-    let maxrange = Math.ceil(Math.max(...mzvals));
-    let minrange = Math.floor(Math.min(...mzvals));
+    let vals = data.map( d => d[0]);
+    let maxrange = Math.ceil(Math.max(...vals));
+    let minrange = Math.floor(Math.min(...vals));
     this.setAttribute('range',`${minrange}-${maxrange}`);
   }
 
@@ -105,6 +127,9 @@ class Peakviewer extends WrapHTML {
     }
     let shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.appendChild(tmpl.content.cloneNode(true));
+    drawAxis(this.shadowRoot.querySelector('svg'));
+    wireEvents(this.shadowRoot.querySelector('svg'));
+
     this.data = Array(300).fill('').map( () => [ Math.random()*1000,Math.random()*100 ]  );
   }
 
