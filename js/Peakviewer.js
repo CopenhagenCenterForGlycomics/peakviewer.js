@@ -53,17 +53,21 @@ tmpl.innerHTML = `
 
 <div class="widget_contents" >
 <svg id="canvas" viewBox="0 0 450 125">
+  <defs id="defs">
+  </defs>
   <g id="selection" transform="translate(30,0)">
     <rect width="0" height="90" x="30" y="5" />
   </g>
   <g id="xaxis" transform="translate(30,95)"></g>
   <g id="yaxis" transform="translate(30,5)"></g>
   <g id="peaks" transform="translate(30,5)"></g>
-  <g id="annotations">
+  <g id="annotations" transform="translate(30,5)">
   </g>
 </svg>
 </div>
-<slot></slot>
+<div style="display: none">
+<slot name="annotations"></slot>
+</div>
 `;
 
 function WrapHTML() { return Reflect.construct(HTMLElement, [], Object.getPrototypeOf(this).constructor); }
@@ -74,19 +78,52 @@ if (window.ShadyCSS) {
   ShadyCSS.prepareTemplate(tmpl, 'x-peaks');
 }
 
-const updateAnnotations = (canvas,annotations) => {
-  console.log(annotations);
-  for (let annotation of annotations) {
-    annotation = canvas.ownerDocument.importNode(annotation,true);
-    canvas.querySelector('#annotations').appendChild(annotation);
+const placeAnnotation = (annotation,data) => {
+  const canvas = annotation.ownerSVGElement;
+  const {x : xScale, y: yScale} = canvasScale(canvas);
+
+  let xpos = parseFloat(annotation.getAttribute('xaxis'));
+  const delta = parseFloat(annotation.getAttribute('delta')) || 0;
+  let closest = data.filter( dat => (dat[0] <= (xpos+delta)) && ((xpos-delta) <= dat[0]) );
+  let nearest = closest[0];
+  if (nearest) {
+    annotation.setAttribute('x',xScale(xpos));
+    annotation.setAttribute('y',yScale(nearest[1]));
+    annotation.style.visibility = 'visible';
+  } else {
+    annotation.style.visibility = 'hidden';
   }
 };
 
-
 const refresh = (viewer) => {
+  if ( ! viewer.data || viewer.data.length === 0 ) {
+    return;
+  }
   updateAxis(viewer.shadowRoot.querySelector('svg'),viewer.range,viewer.data);
   drawAxis(viewer.shadowRoot.querySelector('svg'));
   drawData(viewer.shadowRoot.querySelector('svg #peaks'),viewer.range,viewer.data);
+  for (let annotation of viewer.shadowRoot.querySelectorAll('#annotations *')) {
+    placeAnnotation(annotation,viewer.data);
+  }
+};
+
+const updateAnnotations = (viewer,annotations) => {
+  const canvas = viewer.shadowRoot.querySelector('svg');
+  // We could use the MutationObserver to copy
+  // across the SVG each time it changes
+  for (let parent of annotations) {
+    for (let use of parent.querySelectorAll('*[xaxis]')) {
+      use = use.cloneNode(true);
+      canvas.querySelector('#annotations').appendChild(use);
+      use.setAttribute('width','10');
+      use.setAttribute('height','10');
+      use.style.visibility = 'hidden';
+    }
+    for (let symbol of parent.querySelectorAll('symbol')) {
+      canvas.querySelector('#defs').appendChild(symbol.cloneNode(true));
+    }
+  }
+  refresh(viewer);
 };
 
 
@@ -141,15 +178,19 @@ class Peakviewer extends WrapHTML {
 
     const canvas = this.shadowRoot.querySelector('svg');
 
-    let annotations_slot = this.shadowRoot.querySelector('slot');
-    annotations_slot.addEventListener('slotchange',() => updateAnnotations(canvas,annotations_slot.assignedNodes({flatten: true})));
+    let annotations_slot = this.shadowRoot.querySelector('slot[name="annotations"]');
+    annotations_slot.addEventListener('slotchange',() => updateAnnotations(this,annotations_slot.assignedElements({flatten: true})));
 
-    updateAnnotations(canvas,annotations_slot.assignedNodes({flatten: true}));
 
     drawAxis(canvas);
     wireEvents(canvas);
 
-    this.data = Array(300).fill('').map( () => [ Math.random()*1000,Math.random()*100 ]  );
+    updateAnnotations(this,annotations_slot.assignedElements({flatten: true}));
+
+    for (let annotation of this.shadowRoot.querySelectorAll('#annotations *')) {
+      placeAnnotation(annotation,this.data);
+    }
+
   }
 
 }

@@ -9,5 +9,11 @@
 <body>
 	<x-peaks>
 	</x-peaks>
+	<script>
+		window.onload = () => {
+		    document.querySelector('x-peaks').data = Array(300).fill('').map( () => [ Math.random()*1000,Math.random()*100 ]  );
+
+		};
+	</script>
 </body>
 </html>
