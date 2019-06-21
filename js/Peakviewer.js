@@ -59,8 +59,11 @@ tmpl.innerHTML = `
   <g id="xaxis" transform="translate(30,95)"></g>
   <g id="yaxis" transform="translate(30,5)"></g>
   <g id="peaks" transform="translate(30,5)"></g>
+  <g id="annotations">
+  </g>
 </svg>
 </div>
+<slot></slot>
 `;
 
 function WrapHTML() { return Reflect.construct(HTMLElement, [], Object.getPrototypeOf(this).constructor); }
@@ -70,6 +73,14 @@ Object.setPrototypeOf(WrapHTML, HTMLElement);
 if (window.ShadyCSS) {
   ShadyCSS.prepareTemplate(tmpl, 'x-peaks');
 }
+
+const updateAnnotations = (canvas,annotations) => {
+  console.log(annotations);
+  for (let annotation of annotations) {
+    annotation = canvas.ownerDocument.importNode(annotation,true);
+    canvas.querySelector('#annotations').appendChild(annotation);
+  }
+};
 
 
 const refresh = (viewer) => {
@@ -127,8 +138,16 @@ class Peakviewer extends WrapHTML {
     }
     let shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.appendChild(tmpl.content.cloneNode(true));
-    drawAxis(this.shadowRoot.querySelector('svg'));
-    wireEvents(this.shadowRoot.querySelector('svg'));
+
+    const canvas = this.shadowRoot.querySelector('svg');
+
+    let annotations_slot = this.shadowRoot.querySelector('slot');
+    annotations_slot.addEventListener('slotchange',() => updateAnnotations(canvas,annotations_slot.assignedNodes({flatten: true})));
+
+    updateAnnotations(canvas,annotations_slot.assignedNodes({flatten: true}));
+
+    drawAxis(canvas);
+    wireEvents(canvas);
 
     this.data = Array(300).fill('').map( () => [ Math.random()*1000,Math.random()*100 ]  );
   }
