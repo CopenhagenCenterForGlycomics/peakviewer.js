@@ -60,7 +60,7 @@ if (window.ShadyCSS) {
 
 
 const refresh = (viewer) => {
-  drawAxis(viewer.shadowRoot.querySelector('svg'),viewer.range);
+  drawAxis(viewer.shadowRoot.querySelector('svg'),viewer.range,viewer.data);
   drawData(viewer.shadowRoot.querySelector('svg #peaks'),viewer.range,viewer.data);
 };
 
@@ -96,7 +96,7 @@ class Peakviewer extends WrapHTML {
   }
 
   get data() {
-    return this[symbol_data];
+    return this[symbol_data] || [];
   }
 
   connectedCallback() {
