@@ -86,8 +86,11 @@ const placeAnnotation = (annotation,data) => {
   const delta = parseFloat(annotation.getAttribute('delta')) || 0;
   let closest = data.filter( dat => (dat[0] <= (xpos+delta)) && ((xpos-delta) <= dat[0]) );
   let nearest = closest[0];
-  if (nearest) {
-    annotation.setAttribute('x',xScale(xpos));
+  let [xmin,xmax] = xScale.range();
+  let scaledx = xScale(xpos);
+
+  if (nearest && (scaledx > xmin) && (scaledx < xmax)) {
+    annotation.setAttribute('x',scaledx);
     annotation.setAttribute('y',yScale(nearest[1]));
     annotation.style.visibility = 'visible';
   } else {
