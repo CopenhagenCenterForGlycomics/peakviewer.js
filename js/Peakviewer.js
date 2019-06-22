@@ -14,8 +14,11 @@ import drawData from './data';
 
 import canvasScale from './scale';
 
+import Zoom from './zoom';
+
 const symbol_range = Symbol('range');
 const symbol_data = Symbol('data');
+const symbol_zoom = Symbol('zoom');
 
 const tmpl = document.createElement('template');
 
@@ -26,6 +29,7 @@ tmpl.innerHTML = `
     position: relative;
     --selection-color: #f00;
     --selection-opacity: 0.1;
+    overflow: hidden;
   }
 
   :host([resizeable]) {
@@ -36,6 +40,11 @@ tmpl.innerHTML = `
   #canvas, .widget_contents {
     width: 100%;
     height: 100%;
+  }
+
+  #canvas.scaling {
+    transform-origin: center 75%;
+    transition: transform .1s ease-out;
   }
 
   #selection rect {
@@ -170,6 +179,35 @@ class Peakviewer extends WrapHTML {
 
   get data() {
     return this[symbol_data] || [];
+  }
+
+  get zoom() {
+    return this._zoom || 1;
+  }
+
+  set zoom(zoom) {
+    let curr_zoom = this[symbol_zoom];
+    let zoomval,mid;
+    if (typeof zoom === 'object') {
+      zoomval = zoom.value;
+      mid = zoom.center;
+    } else {
+      zoomval = zoom;
+    }
+    if ( ! curr_zoom ) {
+      curr_zoom = new Zoom(this,this._zoom || 1);
+
+      curr_zoom.finished( () => {
+        this._zoom = curr_zoom.end;
+        let [start,end] = this.getAttribute('range').split('-').map( v => parseFloat(v) );
+        mid = mid ? mid : start + 0.5*(end - start);
+        let factor = (1 / curr_zoom.scale);
+        this.setAttribute('range',`${Math.floor(Math.max(0,mid + factor*(start-mid)))}-${Math.floor(mid+factor*(end-mid))}`);
+        this[symbol_zoom] = null;
+      });
+      this[symbol_zoom] = curr_zoom;
+    }
+    curr_zoom.zoom = zoomval;
   }
 
   connectedCallback() {

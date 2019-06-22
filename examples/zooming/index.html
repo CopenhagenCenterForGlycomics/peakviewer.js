@@ -12,6 +12,17 @@
 	<script>
 		window.onload = () => {
 		    document.querySelector('x-peaks').data = Array(300).fill('').map( () => [ Math.random()*1000,Math.random()*100 ]  );
+		    let direction = 1;
+		    let zoom = 1;
+		    setInterval( () => {
+		    	zoom += direction;
+		    	if (zoom > 40 || zoom < -10) {
+		    		direction *= -1;
+		    	}
+		    	if (zoom <= 30 && zoom >= 1) {
+			    	document.querySelector('x-peaks').zoom = {value: zoom, center: 800};
+			    }
+		    },50);
 
 		};
 	</script>
