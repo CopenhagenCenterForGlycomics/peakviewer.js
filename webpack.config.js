@@ -1,9 +1,12 @@
 module.exports = {
   entry: {
-    'peaks': [ './js/peaks.js' ],
+    'peakviewer': [ './js/peakviewer_web.js' ],
   },
   devtool: 'source-map',
   mode: 'development',
+  optimization: {
+    usedExports: true
+  },
   output: {
     filename: '[name]-bundle.js',
     path: __dirname + '/dist'
