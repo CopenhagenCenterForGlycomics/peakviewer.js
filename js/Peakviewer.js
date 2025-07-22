@@ -83,9 +83,7 @@ tmpl.innerHTML = `
   </g>
 </svg>
 </div>
-<div style="display: none">
-<slot name="annotations"></slot>
-</div>
+<slot name="annotations" style="display: none;"></slot>
 `;
 
 function WrapHTML() { return Reflect.construct(HTMLElement, [], Object.getPrototypeOf(this).constructor); }
@@ -126,15 +124,13 @@ const refresh = (viewer) => {
 
 const updateAnnotations = (viewer,annotations) => {
   const canvas = viewer.shadowRoot.querySelector('svg');
-  // We could use the MutationObserver to copy
-  // across the SVG each time it changes
   for (let parent of annotations) {
-    for (let use of parent.querySelectorAll('*[xaxis]')) {
-      use = use.cloneNode(true);
-      canvas.querySelector('#annotations').appendChild(use);
-      use.setAttribute('width','10');
-      use.setAttribute('height','10');
-      use.style.visibility = 'hidden';
+    for (let xaxis_mark of parent.querySelectorAll('*[xaxis]')) {
+      xaxis_mark = xaxis_mark.cloneNode(true);
+      canvas.querySelector('#annotations').appendChild(xaxis_mark);
+      xaxis_mark.setAttribute('width','10');
+      xaxis_mark.setAttribute('height','10');
+      xaxis_mark.style.visibility = 'hidden';
     }
     for (let symbol of parent.querySelectorAll('symbol')) {
       canvas.querySelector('#defs').appendChild(symbol.cloneNode(true));
