@@ -1,4 +1,4 @@
-/* globals document,HTMLElement,ResizeObserver,customElements */
+/* globals document,HTMLElement,ResizeObserver */
 'use strict';
 
 import * as debug from 'debug-any-level';
@@ -258,7 +258,5 @@ class Peakviewer extends WrapHTML {
   }
 
 }
-
-customElements.define('x-peaks',Peakviewer);
 
 export default Peakviewer;

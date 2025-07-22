@@ -1,6 +1,8 @@
-/*global window*/
+/*globals window*/
 'use strict';
 
-import Peakviewer from './main';
+import Peakviewer, {RegisterElement} from './main';
+
+RegisterElement();
 
 window.Peakviewer = Peakviewer;

@@ -7,11 +7,11 @@
 	<script type="text/javascript" src="/peakviewer-bundle.js"></script>
 </head>
 <body>
-	<x-peaks>
-	</x-peaks>
+	<ccg-peaks>
+	</ccg-peaks>
 	<script>
 		window.onload = () => {
-		    document.querySelector('x-peaks').data = Array(300).fill('').map( () => [ Math.random()*1000,Math.random()*100 ]  );
+		    document.querySelector('ccg-peaks').data = Array(300).fill('').map( () => [ Math.random()*1000,Math.random()*100 ]  );
 		    let direction = 1;
 		    let zoom = 1;
 		    setInterval( () => {
@@ -20,7 +20,7 @@
 		    		direction *= -1;
 		    	}
 		    	if (zoom <= 30 && zoom >= 1) {
-			    	document.querySelector('x-peaks').zoom = {value: zoom, center: 800};
+			    	document.querySelector('ccg-peaks').zoom = {value: zoom, center: 800};
 			    }
 		    },50);
 
