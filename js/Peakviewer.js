@@ -124,6 +124,7 @@ const refresh = (viewer) => {
 
 const updateAnnotations = (viewer,annotations) => {
   const canvas = viewer.shadowRoot.querySelector('svg');
+  canvas.querySelector('#annotations').innerHTML = '';
   for (let parent of annotations) {
     for (let xaxis_mark of parent.querySelectorAll('*[xaxis]')) {
       xaxis_mark = xaxis_mark.cloneNode(true);
