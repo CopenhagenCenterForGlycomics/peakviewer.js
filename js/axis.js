@@ -14,16 +14,15 @@ const updateAxis = (canvas,range,data) => {
   xRange.domain(range);
   yRange.domain([Math.ceil(Math.max(...data.filter(d => d[0] <= range[1] && d[0] >= range[0] ).map( d => d[1] ))),0]);
 
-  let max_y = Math.max(...yRange.domain());
-  let max_x = Math.max(...xRange.domain());
+  let max_label_width = Math.max(...[...xRange.domain(),...yRange.domain()]);
 
 
   let formatter = formatLocale('^5.4~g');
-  let y_width = formatter.format('^5.4~g')(max_y).length;
-  let x_width = formatter.format('^5.4~g')(max_x).length;
+  let y_width = formatter.format('^5.4~g')(max_label_width).length;
+  let x_width = formatter.format('^5.4~g')(max_label_width).length;
 
-  d3.select(canvas.querySelector('g#yaxis')).style('font-size', `calc(${60/y_width}px * var(--text-factor))` );
-  d3.select(canvas.querySelector('g#xaxis')).style('font-size', `calc(${60/x_width}px * var(--text-factor))` );
+  d3.select(canvas.querySelector('g#yaxis')).style('font-size', `calc(${90/y_width}px * var(--text-factor))` );
+  d3.select(canvas.querySelector('g#xaxis')).style('font-size', `calc(${90/x_width}px * var(--text-factor))` );
 
 
 };

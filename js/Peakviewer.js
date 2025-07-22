@@ -1,4 +1,4 @@
-/* globals document,HTMLElement,ResizeObserver,customElements,window,ShadyCSS */
+/* globals document,HTMLElement,ResizeObserver,customElements */
 'use strict';
 
 import * as debug from 'debug-any-level';
@@ -22,6 +22,8 @@ const symbol_zoom = Symbol('zoom');
 
 const tmpl = document.createElement('template');
 
+const LEFT_MARGIN=45;
+
 tmpl.innerHTML = `
 <style>
   :host {
@@ -35,6 +37,13 @@ tmpl.innerHTML = `
   :host([resizeable]) {
     resize: both;
     overflow: auto;
+  }
+  :host #canvas {
+    visibility: hidden
+  }
+
+  :host([range]) #canvas {
+    visibility: visible;
   }
 
   #canvas, .widget_contents {
@@ -61,16 +70,16 @@ tmpl.innerHTML = `
 </style>
 
 <div class="widget_contents" >
-<svg id="canvas" viewBox="0 0 450 125">
+<svg id="canvas" viewBox="0 0 ${420+LEFT_MARGIN} 125">
   <defs id="defs">
   </defs>
-  <g id="selection" transform="translate(30,0)">
-    <rect width="0" height="90" x="30" y="5" />
+  <g id="selection" transform="translate(${LEFT_MARGIN},0)">
+    <rect width="0" height="90" x="${LEFT_MARGIN}" y="5" />
   </g>
-  <g id="xaxis" transform="translate(30,95)"></g>
-  <g id="yaxis" transform="translate(30,5)"></g>
-  <g id="peaks" transform="translate(30,5)"></g>
-  <g id="annotations" transform="translate(30,5)">
+  <g id="xaxis" transform="translate(${LEFT_MARGIN},95)"></g>
+  <g id="yaxis" transform="translate(${LEFT_MARGIN},5)"></g>
+  <g id="peaks" transform="translate(${LEFT_MARGIN},5)"></g>
+  <g id="annotations" transform="translate(${LEFT_MARGIN},5)">
   </g>
 </svg>
 </div>
@@ -82,10 +91,6 @@ tmpl.innerHTML = `
 function WrapHTML() { return Reflect.construct(HTMLElement, [], Object.getPrototypeOf(this).constructor); }
 Object.setPrototypeOf(WrapHTML.prototype, HTMLElement.prototype);
 Object.setPrototypeOf(WrapHTML, HTMLElement);
-
-if (window.ShadyCSS) {
-  ShadyCSS.prepareTemplate(tmpl, 'x-peaks');
-}
 
 const placeAnnotation = (annotation,data) => {
   const canvas = annotation.ownerSVGElement;
@@ -100,7 +105,7 @@ const placeAnnotation = (annotation,data) => {
 
   if (nearest && (scaledx > xmin) && (scaledx < xmax)) {
     annotation.setAttribute('x',scaledx);
-    annotation.setAttribute('y',yScale(nearest[1]));
+    annotation.setAttribute('y',yScale(nearest[1] + parseFloat(annotation.getAttribute('dy') || 0) ));
     annotation.style.visibility = 'visible';
   } else {
     annotation.style.visibility = 'hidden';
@@ -114,7 +119,7 @@ const refresh = (viewer) => {
   updateAxis(viewer.shadowRoot.querySelector('svg'),viewer.range,viewer.data);
   drawAxis(viewer.shadowRoot.querySelector('svg'));
   drawData(viewer.shadowRoot.querySelector('svg #peaks'),viewer.range,viewer.data);
-  for (let annotation of viewer.shadowRoot.querySelectorAll('#annotations *')) {
+  for (let annotation of viewer.shadowRoot.querySelectorAll('#annotations > *')) {
     placeAnnotation(annotation,viewer.data);
   }
 };
@@ -230,9 +235,7 @@ class Peakviewer extends WrapHTML {
   }
 
   connectedCallback() {
-    if (window.ShadyCSS) {
-      ShadyCSS.styleElement(this);
-    }
+
     let shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.appendChild(tmpl.content.cloneNode(true));
 
@@ -248,7 +251,7 @@ class Peakviewer extends WrapHTML {
 
     updateAnnotations(this,annotations_slot.assignedElements({flatten: true}));
 
-    for (let annotation of this.shadowRoot.querySelectorAll('#annotations *')) {
+    for (let annotation of this.shadowRoot.querySelectorAll('#annotations > *')) {
       placeAnnotation(annotation,this.data);
     }
 
