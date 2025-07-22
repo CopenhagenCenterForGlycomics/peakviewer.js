@@ -129,9 +129,12 @@ const updateAnnotations = (viewer,annotations) => {
     for (let xaxis_mark of parent.querySelectorAll('*[xaxis]')) {
       xaxis_mark = xaxis_mark.cloneNode(true);
       canvas.querySelector('#annotations').appendChild(xaxis_mark);
-      xaxis_mark.setAttribute('width','10');
-      xaxis_mark.setAttribute('height','10');
+      xaxis_mark.setAttribute('width','50');
+      xaxis_mark.setAttribute('height','50');
       xaxis_mark.style.visibility = 'hidden';
+      if (xaxis_mark.getAttribute('href')) {
+        xaxis_mark.setAttribute('viewBox',parent.querySelector(xaxis_mark.getAttribute('href')).getAttribute('viewBox'));
+      }
     }
     for (let symbol of parent.querySelectorAll('symbol')) {
       canvas.querySelector('#defs').appendChild(symbol.cloneNode(true));
