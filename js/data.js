@@ -21,7 +21,7 @@ const drawData = (element,range,data) => {
     .attr('y', d => yScale(d[1]))
     .attr('height',d => yScale(max_y - d[1]))
     .style('visibility', d => (d[0] >= range[0] && d[0] <= range[1]) ? 'visible': 'hidden')
-    .attr('width',0.1);
+    .attr('width',0.2);
 
   rects
     .attr('x', d => xScale(d[0]))

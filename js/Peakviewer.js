@@ -1,4 +1,4 @@
-/* globals document,HTMLElement,customElements,window,ShadyCSS */
+/* globals document,HTMLElement,ResizeObserver,customElements,window,ShadyCSS */
 'use strict';
 
 import * as debug from 'debug-any-level';
@@ -139,6 +139,25 @@ const updateAnnotations = (viewer,annotations) => {
 };
 
 
+const fixTextScaling = (svg) => {
+  // We assume the SVG has a viewBox attribute
+  // Getting the natural width of the SVG from the viewBox attribute
+  const width = svg.getAttribute('viewBox').split(' ')[2];
+
+  // Set the initial value for the scaling factor and mark it as loaded
+  svg.style.setProperty('--text-factor', width / svg.clientWidth);
+
+  // Update the scaling factor when SVG is resized
+  const resizeObserver = new ResizeObserver(() => {
+    svg.style.setProperty('--text-factor', width / svg.clientWidth);
+  });
+
+  resizeObserver.observe(svg);
+
+  // In a real app, you'll want to disconnect the observer
+  // on unmount by calling resizeObserver.disconnect();
+};
+
 class Peakviewer extends WrapHTML {
 
   static get observedAttributes() {
@@ -225,6 +244,7 @@ class Peakviewer extends WrapHTML {
 
     drawAxis(canvas);
     wireEvents(canvas);
+    fixTextScaling(canvas);
 
     updateAnnotations(this,annotations_slot.assignedElements({flatten: true}));
 

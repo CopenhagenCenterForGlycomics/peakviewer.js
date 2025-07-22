@@ -9,7 +9,7 @@
     "build-web": "./node_modules/.bin/webpack -d",
     "build-watch-web": "./node_modules/.bin/webpack --watch",
     "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "lint": "jshint .",
+    "lint": "npx jshint .",
     "validate": "npm ls"
   },
   "dependencies": {
