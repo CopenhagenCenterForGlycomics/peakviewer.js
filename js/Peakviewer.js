@@ -23,6 +23,7 @@ const symbol_zoom = Symbol('zoom');
 const tmpl = document.createElement('template');
 
 const LEFT_MARGIN=45;
+const ANNOTATION_SIZE=25;
 
 tmpl.innerHTML = `
 <style>
@@ -102,8 +103,8 @@ const placeAnnotation = (annotation,data) => {
   let scaledx = xScale(xpos);
 
   if (nearest && (scaledx > xmin) && (scaledx < xmax)) {
-    annotation.setAttribute('x',scaledx);
-    annotation.setAttribute('y',yScale(nearest[1] + parseFloat(annotation.getAttribute('dy') || 0) ));
+    annotation.setAttribute('x',scaledx+ANNOTATION_SIZE*parseFloat(annotation.getAttribute('dx_relative')|| 0));
+    annotation.setAttribute('y',yScale(nearest[1] + parseFloat(annotation.getAttribute('dy') || 0) )+ANNOTATION_SIZE*parseFloat(annotation.getAttribute('dy_relative')|| 0));
     annotation.style.visibility = 'visible';
   } else {
     annotation.style.visibility = 'hidden';
@@ -129,8 +130,8 @@ const updateAnnotations = (viewer,annotations) => {
     for (let xaxis_mark of parent.querySelectorAll('*[xaxis]')) {
       xaxis_mark = xaxis_mark.cloneNode(true);
       canvas.querySelector('#annotations').appendChild(xaxis_mark);
-      xaxis_mark.setAttribute('width','50');
-      xaxis_mark.setAttribute('height','50');
+      xaxis_mark.setAttribute('width',ANNOTATION_SIZE);
+      xaxis_mark.setAttribute('height',ANNOTATION_SIZE);
       xaxis_mark.style.visibility = 'hidden';
       if (xaxis_mark.getAttribute('href')) {
         xaxis_mark.setAttribute('viewBox',parent.querySelector(xaxis_mark.getAttribute('href')).getAttribute('viewBox'));
