@@ -22,8 +22,11 @@ const symbol_zoom = Symbol('zoom');
 
 const tmpl = document.createElement('template');
 
-const LEFT_MARGIN=45;
-const ANNOTATION_SIZE=25;
+export const LEFT_MARGIN=45;
+export const ANNOTATION_SIZE=25;
+export const TOP_MARGIN=30;
+export const PLOT_HEIGHT=90;
+export const BOTTOM_MARGIN=30;
 
 tmpl.innerHTML = `
 <style>
@@ -71,16 +74,16 @@ tmpl.innerHTML = `
 </style>
 
 <div class="widget_contents" >
-<svg id="canvas" viewBox="0 0 ${420+LEFT_MARGIN} 125">
+<svg id="canvas" viewBox="0 0 ${420+LEFT_MARGIN} ${TOP_MARGIN+PLOT_HEIGHT+BOTTOM_MARGIN}">
   <defs id="defs">
   </defs>
   <g id="selection" transform="translate(${LEFT_MARGIN},0)">
-    <rect width="0" height="90" x="${LEFT_MARGIN}" y="5" />
+    <rect width="0" height="${PLOT_HEIGHT}" x="${LEFT_MARGIN}" y="${TOP_MARGIN}" />
   </g>
-  <g id="xaxis" transform="translate(${LEFT_MARGIN},95)"></g>
-  <g id="yaxis" transform="translate(${LEFT_MARGIN},5)"></g>
-  <g id="peaks" transform="translate(${LEFT_MARGIN},5)"></g>
-  <g id="annotations" transform="translate(${LEFT_MARGIN},5)">
+  <g id="xaxis" transform="translate(${LEFT_MARGIN},${TOP_MARGIN+PLOT_HEIGHT})"></g>
+  <g id="yaxis" transform="translate(${LEFT_MARGIN},${TOP_MARGIN})"></g>
+  <g id="peaks" transform="translate(${LEFT_MARGIN},${TOP_MARGIN})"></g>
+  <g id="annotations" transform="translate(${LEFT_MARGIN},${TOP_MARGIN})">
   </g>
 </svg>
 </div>
