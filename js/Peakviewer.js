@@ -91,7 +91,7 @@ function WrapHTML() { return Reflect.construct(HTMLElement, [], Object.getProtot
 Object.setPrototypeOf(WrapHTML.prototype, HTMLElement.prototype);
 Object.setPrototypeOf(WrapHTML, HTMLElement);
 
-const placeAnnotation = (annotation,data) => {
+const placeAnnotation = (annotation,data,annotationSize) => {
   const canvas = annotation.ownerSVGElement;
   const {x : xScale, y: yScale} = canvasScale(canvas);
 
@@ -103,8 +103,8 @@ const placeAnnotation = (annotation,data) => {
   let scaledx = xScale(xpos);
 
   if (nearest && (scaledx > xmin) && (scaledx < xmax)) {
-    annotation.setAttribute('x',scaledx+ANNOTATION_SIZE*parseFloat(annotation.getAttribute('dx_relative')|| 0));
-    annotation.setAttribute('y',yScale(nearest[1] + parseFloat(annotation.getAttribute('dy') || 0) )+ANNOTATION_SIZE*parseFloat(annotation.getAttribute('dy_relative')|| 0));
+    annotation.setAttribute('x',scaledx+annotationSize*parseFloat(annotation.getAttribute('dx_relative')|| 0));
+    annotation.setAttribute('y',yScale(nearest[1] + parseFloat(annotation.getAttribute('dy') || 0) )+annotationSize*parseFloat(annotation.getAttribute('dy_relative')|| 0));
     annotation.style.visibility = 'visible';
   } else {
     annotation.style.visibility = 'hidden';
@@ -119,7 +119,7 @@ const refresh = (viewer) => {
   drawAxis(viewer.shadowRoot.querySelector('svg'));
   drawData(viewer.shadowRoot.querySelector('svg #peaks'),viewer.range,viewer.data);
   for (let annotation of viewer.shadowRoot.querySelectorAll('#annotations > *')) {
-    placeAnnotation(annotation,viewer.data);
+    placeAnnotation(annotation,viewer.data,viewer.annotationSize);
   }
 };
 
@@ -130,8 +130,8 @@ const updateAnnotations = (viewer,annotations) => {
     for (let xaxis_mark of parent.querySelectorAll('*[xaxis]')) {
       xaxis_mark = xaxis_mark.cloneNode(true);
       canvas.querySelector('#annotations').appendChild(xaxis_mark);
-      xaxis_mark.setAttribute('width',ANNOTATION_SIZE);
-      xaxis_mark.setAttribute('height',ANNOTATION_SIZE);
+      xaxis_mark.setAttribute('width',viewer.annotationSize);
+      xaxis_mark.setAttribute('height',viewer.annotationSize);
       xaxis_mark.style.visibility = 'hidden';
       if (xaxis_mark.getAttribute('href')) {
         xaxis_mark.setAttribute('viewBox',parent.querySelector(xaxis_mark.getAttribute('href')).getAttribute('viewBox'));
@@ -188,6 +188,10 @@ class Peakviewer extends WrapHTML {
       selection_rect.setAttribute('width',Math.abs(xScale(end) - xScale(start)));
       selection_rect.setAttribute('x',xScale(start));
     }
+  }
+
+  get annotationSize() {
+    return ANNOTATION_SIZE;
   }
 
   get range() {
