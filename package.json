@@ -2,6 +2,10 @@
   "name": "peakviewer.js",
   "version": "0.0.1",
   "description": "Peak renderer web component",
+  "exports": {
+    ".": "./js/main.js",
+    "./scale": "./js/scale.js"
+  },
   "main": "./js/index.js",
   "module": "./js/main.js",
   "scripts": {

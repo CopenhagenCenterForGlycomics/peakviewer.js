@@ -112,7 +112,7 @@ const placeAnnotation = (annotation,data) => {
 };
 
 const refresh = (viewer) => {
-  if ( ! viewer.data || viewer.data.length === 0 ) {
+  if ( (! viewer.data) || viewer.data.length === 0 || (! viewer.shadowRoot) ) {
     return;
   }
   updateAxis(viewer.shadowRoot.querySelector('svg'),viewer.range,viewer.data);
