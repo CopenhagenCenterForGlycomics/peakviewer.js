@@ -32,7 +32,6 @@ tmpl.innerHTML = `
 <style>
   :host {
     display: block;
-    position: relative;
     --selection-color: #f00;
     --selection-opacity: 0.1;
     overflow: hidden;
@@ -204,8 +203,10 @@ class Peakviewer extends WrapHTML {
   set data(data) {
     this[symbol_data] = data;
     let vals = data.map( d => d[0]);
-    let maxrange = Math.ceil(Math.max(...vals));
-    let minrange = Math.floor(Math.min(...vals));
+    const dataMin = vals.length ? vals.reduce((m, v) => v < m ? v : m, Infinity)  : 0;
+    const dataMax = vals.length ? vals.reduce((m, v) => v > m ? v : m, -Infinity) : 1;
+    let maxrange = Math.ceil(dataMax);
+    let minrange = Math.floor(dataMin);
     this.setAttribute('range',`${minrange}-${maxrange}`);
   }
 

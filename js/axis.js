@@ -7,14 +7,21 @@ const d3 = { select, axisBottom, axisLeft };
 
 import canvasScale from './scale';
 
+const arraymax = (array) => {
+  if (! array.length ) {
+    return;
+  }
+  return array.reduce((m, v) => v > m ? v : m, -Infinity);
+};
+
 const updateAxis = (canvas,range,data) => {
 
   const {x : xRange ,y : yRange } = canvasScale(canvas);
 
   xRange.domain(range);
-  yRange.domain([Math.ceil(Math.max(...data.filter(d => d[0] <= range[1] && d[0] >= range[0] ).map( d => d[1] ))),0]);
+  yRange.domain([Math.ceil(arraymax(data.filter(d => d[0] <= range[1] && d[0] >= range[0] ).map( d => d[1] ))),0]);
 
-  let max_label_width = Math.max(...[...xRange.domain(),...yRange.domain()]);
+  let max_label_width = arraymax([...xRange.domain(),...yRange.domain()]);
 
 
   let formatter = formatLocale('^5.4~g');
