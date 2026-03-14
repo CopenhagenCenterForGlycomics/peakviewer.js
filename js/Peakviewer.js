@@ -64,6 +64,22 @@ tmpl.innerHTML = `
     opacity: var(--selection-opacity,0.5);
   }
 
+  #peaks rect {
+    fill: var(--peak-fill, black);
+    stroke: transparent;
+    stroke-width: var(--peak-hit-width, 4);
+    pointer-events: all;
+    transition: fill 0.1s, opacity 0.1s, stroke 0.1s, stroke-width 0.1s;
+  }
+
+  #peaks rect:hover {
+    fill: var(--peak-hover-fill, var(--peak-fill, black));
+    opacity: var(--peak-hover-opacity, 0.6);
+    stroke: var(--peak-hover-fill, var(--peak-fill, black));
+    stroke-width: var(--peak-hover-stroke-width, var(--peak-hit-width, 4));
+    cursor: var(--peak-hover-cursor, crosshair);
+  }
+
   @media only screen
     and (min-device-width: 320px)
     and (max-device-width: 480px)

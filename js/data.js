@@ -17,6 +17,7 @@ const drawData = (element,range,data) => {
 
   rects.enter()
     .append('rect')
+    .attr('part', d => d[2] ? `peak ${d[2]}` : 'peak')
     .attr('x', d => xScale(d[0]))
     .attr('y', d => yScale(d[1]))
     .attr('height',d => yScale(max_y - d[1]))
@@ -24,6 +25,7 @@ const drawData = (element,range,data) => {
     .attr('width',0.2);
 
   rects
+    .attr('part', d => d[2] ? `peak ${d[2]}` : 'peak')
     .attr('x', d => xScale(d[0]))
     .attr('y', d => yScale(d[1]))
     .attr('height',d => yScale(max_y - d[1]))
