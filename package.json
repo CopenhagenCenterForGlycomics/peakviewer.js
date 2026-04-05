@@ -36,6 +36,11 @@
   "pre-commit": [
     "jshint-pre-commit"
   ],
+  "files": ["js/", "package.json"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CopenhagenCenterForGlycomics/peakviewer.js.git"
+  },
   "author": "hirenj@gmail.com",
   "license": "ISC"
 }
