@@ -168,13 +168,19 @@ const fixTextScaling = (svg) => {
   // Getting the natural width of the SVG from the viewBox attribute
   const width = svg.getAttribute('viewBox').split(' ')[2];
 
+  const updateFactor = () => {
+    // Skip when hidden (clientWidth === 0) to avoid setting --text-factor to
+    // Infinity, which makes the calc() font-size invalid and erases axis labels.
+    if (svg.clientWidth > 0) {
+      svg.style.setProperty('--text-factor', width / svg.clientWidth);
+    }
+  };
+
   // Set the initial value for the scaling factor and mark it as loaded
-  svg.style.setProperty('--text-factor', width / svg.clientWidth);
+  updateFactor();
 
   // Update the scaling factor when SVG is resized
-  const resizeObserver = new ResizeObserver(() => {
-    svg.style.setProperty('--text-factor', width / svg.clientWidth);
-  });
+  const resizeObserver = new ResizeObserver(updateFactor);
 
   resizeObserver.observe(svg);
 
