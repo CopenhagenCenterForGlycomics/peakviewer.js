@@ -32,6 +32,10 @@ tmpl.innerHTML = `
 <style>
   :host {
     display: block;
+    /* A plot keeps its left-to-right axes in RTL pages; inherited
+       direction: rtl would flip SVG text anchoring and put the axis labels
+       on top of the axis lines. */
+    direction: ltr;
     --selection-color: #f00;
     --selection-opacity: 0.1;
     overflow: hidden;
