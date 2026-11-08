@@ -57,7 +57,9 @@ const updateAxis = (canvas,range,data) => {
     PLOT_HEIGHT / (LINE_HEIGHT * Math.max(1, y.count - 1)),
     PLOT_WIDTH / (Math.max(1, x.count - 1) * (CHAR_WIDTH * Math.max(5, x.length) + 1))
   );
-  const font_size = `min(calc(${90/label_width}px * var(--text-factor)), ${cap.toFixed(2)}px)`;
+  // The on-screen size is in rem (90px / 16 at the default base), so it
+  // follows the page's base font size; the cap stays in viewBox units.
+  const font_size = `min(calc(${(90/16/label_width).toFixed(4)}rem * var(--text-factor)), ${cap.toFixed(2)}px)`;
 
   d3.select(canvas.querySelector('g#yaxis')).style('font-size', font_size );
   d3.select(canvas.querySelector('g#xaxis')).style('font-size', font_size );
