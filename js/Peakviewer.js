@@ -148,6 +148,10 @@ const refresh = (viewer) => {
 const updateAnnotations = (viewer,annotations) => {
   const canvas = viewer.shadowRoot.querySelector('svg');
   canvas.querySelector('#annotations').innerHTML = '';
+  // #defs holds only the symbols copied below, and every update copies the
+  // full set again. Without clearing it, symbols with reused ids piled up and
+  // href="#id" found the first (oldest) copy: old labels at new peaks.
+  canvas.querySelector('#defs').replaceChildren();
   for (let parent of annotations) {
     for (let xaxis_mark of parent.querySelectorAll('*[xaxis]')) {
       xaxis_mark = xaxis_mark.cloneNode(true);
