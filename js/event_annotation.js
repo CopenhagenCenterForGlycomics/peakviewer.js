@@ -9,9 +9,13 @@ const annotate_event = function(canvas,event) {
     var pt=canvas.createSVGPoint();
     pt.x=event.clientX;
     pt.y=event.clientY;
-    let {x: svgx, y: svgy} = pt.matrixTransform(canvas.getScreenCTM().inverse());
-    let xval = scaleX.invert(svgx - 30);
-    let yval = scaleY.invert(svgy - 5);
+    // Into the plot's own coordinates (the #peaks group, offset by the
+    // margins), where the scales map m/z and intensity. Hard-coded margins
+    // here had drifted from the drawn ones, shifting every hit by 15 units.
+    const plot = canvas.querySelector('#peaks') || canvas;
+    let {x: plotx, y: ploty} = pt.matrixTransform(plot.getScreenCTM().inverse());
+    let xval = scaleX.invert(plotx);
+    let yval = scaleY.invert(ploty);
 
     event.peak = { x: xval, y: yval };
   }
